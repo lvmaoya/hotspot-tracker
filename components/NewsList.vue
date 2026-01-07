@@ -74,14 +74,14 @@ const formatHot = (hot) => {
 .rank {
   width: 1rem;
   text-align: left;
-  color: #666;
+  color: var(--text-secondary);
 }
 .title {
   flex: 1;
   min-width: 0;
 }
 .title a {
-  color: #000;
+  color: var(--text-primary);
   text-decoration: none;
 }
 .title:hover a {
@@ -96,6 +96,6 @@ const formatHot = (hot) => {
   white-space: nowrap;
 }
 .hot {
-  color: #666;
+  color: var(--text-secondary);
 }
 </style>

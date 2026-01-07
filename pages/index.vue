@@ -1,62 +1,9 @@
 <template>
-  <div class="min-h-screen yun-bai-bg">
-    <header>
-      <div
-        class="mx-auto pl-4 pt-32 max-w-5xl h-full flex items-center justify-between"
-      >
-        <div class="flex flex-col">
-          <div class="font-extrabold text-3xl tracking-wide">记录发生</div>
-          <div class="mt-3 flex items-center gap-2 text-[#666] italic">
-            整理当下最受关注的社会议题
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button
-            type="button"
-            class="inline-flex items-center gap-1.5 px-2.5 py-1.5"
-            aria-label="筛选"
-          >
-            <span class="text-sm text-gray-800">筛选</span>
-            <svg
-              class="w-4 h-4 text-gray-700"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 4h18M7 12h10M10 20h4"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            class="inline-flex items-center gap-1.5 px-2.5 py-1.5"
-            aria-label="排序"
-          >
-            <span class="text-sm text-gray-800">排序</span>
-            <svg
-              class="w-4 h-4 text-gray-700"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </header>
+  <div class="min-h-screen">
+    <SiteHeader />
 
     <!-- 主内容区 -->
-    <main class="mx-auto px-4 pt-8 pb-8 max-w-5xl">
+    <main class="mx-auto px-4 pt-12 pb-8 max-w-5xl">
       <!-- 加载状态 -->
       <div v-if="pending" class="text-center py-20">
         <div class="inline-flex flex-col items-center gap-4">
@@ -135,38 +82,11 @@
         </div>
       </div>
     </main>
-    <footer class="mt-12">
-      <div class="mx-auto px-4 py-12 max-w-5xl border-t border-gray-200">
-        <!-- 宣言 -->
-        <p class="text-lg">T R A C K E R</p>
-
-        <!-- 说明 -->
-        <p class="mt-8 text-sm leading-relaxed text-[#666]">
-          本站记录公共事件在不同平台中的关注变化，仅用于信息整理与趋势观察，不参与讨论与判断。
-        </p>
-
-        <!-- 底部信息 -->
-        <div
-          class="mt-8 flex flex-col gap-2 text-sm text-[#999] sm:flex-row sm:items-center sm:justify-between"
-        >
-          <span>
-            © {{ new Date().getFullYear() }} · Public Attention Archive
-          </span>
-        </div>
-      </div>
-    </footer>
   </div>
 </template>
 
 <script setup>
 import Lenis from "lenis";
-const lastUpdatedAt = ref(Date.now());
-const lastUpdateLabel = computed(() =>
-  new Date(lastUpdatedAt.value).toLocaleTimeString("zh-CN", {
-    hour: "2-digit",
-    minute: "2-digit",
-  })
-);
 // 服务端数据获取
 const {
   data: newsData,
@@ -196,7 +116,6 @@ const refreshData = async () => {
     console.error("刷新失败:", err);
   } finally {
     loading.value = false;
-    lastUpdatedAt.value = Date.now();
   }
 };
 
@@ -235,27 +154,4 @@ const showToast = (message) => {
 </script>
 
 <style scoped>
-.yun-bai-bg {
-  background: #fff;
-}
-:global(html.lenis) {
-  height: auto;
-}
-:global(.lenis) {
-  scroll-behavior: auto !important;
-}
-:global(.lenis body) {
-  overflow: auto;
-}
-/* 页面过渡动画 */
-.page-enter-active,
-.page-leave-active {
-  transition: all 0.3s ease;
-}
-
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
-}
 </style>

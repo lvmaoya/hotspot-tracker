@@ -5,6 +5,10 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss'
   ],
   
+  css: [
+    '~/assets/css/theme.css'
+  ],
+  
   runtimeConfig: {
     public: {
       appName: '热点新闻追踪'
