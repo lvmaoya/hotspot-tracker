@@ -5,41 +5,9 @@
         class="mx-auto pl-4 pt-32 max-w-5xl h-full flex items-center justify-between"
       >
         <div class="flex flex-col">
-          <div class="font-[700] text-4xl text-gray-900 tracking-wide">
-            T R A C K E R
-          </div>
-          <div class="mt-2 flex items-center gap-2 text-sm text-gray-500">
-            <div @click="refreshData">
-              <svg
-                v-if="!loading"
-                class="w-3.5 h-3.5 text-gray-700"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                />
-              </svg>
-              <svg
-                v-else
-                class="w-3.5 h-3.5 text-gray-700 animate-spin"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 4v5m0 0H9M20 15v5m0 0h-5"
-                />
-              </svg>
-            </div>
-            <span>上次更新 {{ lastUpdateLabel }}</span>
+          <div class="font-extrabold text-3xl tracking-wide">记录发生</div>
+          <div class="mt-3 flex items-center gap-2 text-[#666] italic">
+            整理当下最受关注的社会议题
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -167,6 +135,26 @@
         </div>
       </div>
     </main>
+    <footer class="mt-12">
+      <div class="mx-auto px-4 py-12 max-w-5xl border-t border-gray-200">
+        <!-- 宣言 -->
+        <p class="text-lg">T R A C K E R</p>
+
+        <!-- 说明 -->
+        <p class="mt-8 text-sm leading-relaxed text-[#666]">
+          本站记录公共事件在不同平台中的关注变化，仅用于信息整理与趋势观察，不参与讨论与判断。
+        </p>
+
+        <!-- 底部信息 -->
+        <div
+          class="mt-8 flex flex-col gap-2 text-sm text-[#999] sm:flex-row sm:items-center sm:justify-between"
+        >
+          <span>
+            © {{ new Date().getFullYear() }} · Public Attention Archive
+          </span>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
