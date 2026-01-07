@@ -3,7 +3,7 @@
     <SiteHeader />
 
     <!-- 主内容区 -->
-    <main class="mx-auto px-4 pt-12 pb-8 max-w-5xl">
+    <main class="mx-auto px-4 pt-16 pb-8 max-w-5xl">
       <!-- 加载状态 -->
       <div v-if="pending" class="text-center py-20">
         <div class="inline-flex flex-col items-center gap-4">

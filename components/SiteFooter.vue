@@ -12,7 +12,7 @@
     <div class="px-4 py-12 border-t border-soft flex items-center justify-end">
       <button
         type="button"
-        class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-soft card-bg hover:bg-white transition-colors"
+        class="inline-flex items-center justify-center w-10 h-10 rounded-md"
         :aria-label="isDark ? '切换为明亮主题' : '切换为暗色主题'"
         title="主题切换"
         @click="toggleTheme"
