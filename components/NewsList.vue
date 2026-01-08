@@ -12,7 +12,8 @@
         >
         <span v-else>{{ item.title }}</span>
       </span>
-      <span class="hot">🔥 {{ formatHot(pickHot(item)) }}</span>
+      <span class="platform">{{ item.icon || '' }}</span>
+      <span class="hot">{{ formatHot(pickHot(item)) }}</span>
     </li>
   </ul>
 </template>
@@ -96,6 +97,9 @@ const formatHot = (hot) => {
   white-space: nowrap;
 }
 .hot {
+  color: var(--text-secondary);
+}
+.platform {
   color: var(--text-secondary);
 }
 </style>
