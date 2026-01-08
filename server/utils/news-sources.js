@@ -36,21 +36,25 @@ export const newsSources = [
   {
     name: '知乎热榜',
     platform: 'zhihu',
-    url: 'https://www.zhihu.com/api/v3/feed/topstory/hot-lists/total',
+    url: 'https://www.zhihu.com/api/v3/explore/guest/feeds?limit=15&ws_qiangzhisafe=0',
     icon: '📚',
     color: 'blue',
     parseData: (data) => {
       try {
-        if (data.data) {
-          return data.data.slice(0, 20).map(item => ({
-            title: item.target.title,
-            hot: item.detail_text,
-            url: `https://www.zhihu.com/question/${item.target.id}`,
-            tag: item.target.type,
-            icon: '📚'
-          }))
-        }
-        return []
+        if (!data || !Array.isArray(data.data)) return []
+        return data.data.slice(0, 20).map(entry => {
+          const t = entry.target || {}
+          const title = (t.question && t.question.title) || t.title || ''
+          const hot = typeof t.voteup_count === 'number' ? t.voteup_count : (t.thanks_count || 0)
+          let url = ''
+          if (t.question && t.question.id && t.id) {
+            url = `https://www.zhihu.com/question/${t.question.id}/answer/${t.id}`
+          } else if (typeof t.url === 'string') {
+            url = t.url.replace('https://api.zhihu.com/answers/', 'https://www.zhihu.com/answer/')
+          }
+          const tag = '热门'
+          return { title, hot, url, tag, icon: '📚' }
+        })
       } catch (error) {
         console.error('解析知乎数据失败:', error)
         return []
@@ -59,8 +63,9 @@ export const newsSources = [
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       'Accept': 'application/json',
-      'Referer': 'https://www.zhihu.com/'
-    }
+      'Referer': 'https://www.zhihu.com/explore'
+    },
+    responseType: 'json'
   },
   {
     name: '百度热搜',
