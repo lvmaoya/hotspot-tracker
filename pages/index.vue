@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen">
-    <SiteHeader />
+    <SiteHeader @filter="showFilter = true" />
 
     <!-- 主内容区 -->
     <main class="mx-auto px-4 pt-16 pb-8 max-w-5xl">
@@ -53,6 +53,79 @@
       <!-- 新闻列表 -->
       <div v-else class="space-y-6">
         <NewsList :news="filteredNews" class="transition-all duration-300" />
+        <div
+          v-if="showFilter"
+          class="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+          @click="showFilter = false"
+        >
+          <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6" @click.stop>
+            <div class="text-lg font-semibold text-gray-900 mb-6">筛选</div>
+            <div class="space-y-6">
+              <div class="space-y-3">
+                <label class="text-sm font-medium text-gray-700">数据源</label>
+                <div class="flex flex-wrap gap-2">
+                  <div
+                    v-for="opt in platformOptions"
+                    :key="opt.id"
+                    class="inline-flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer"
+                    :class="selectedPlatforms[opt.id] ? 'text-black' : 'text-gray-700'"
+                    @click="togglePlatform(opt.id)"
+                  >
+                    <span
+                      class="inline-flex items-center justify-center w-3 h-3 rounded-full border"
+                      :class="selectedPlatforms[opt.id] ? 'border-black' : 'border-gray-400'"
+                    >
+                      <span
+                        v-if="selectedPlatforms[opt.id]"
+                        class="w-2 h-2 bg-black rounded-full"
+                      />
+                    </span>
+                    <span>{{ opt.name }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="space-y-3">
+                <label class="text-sm font-medium text-gray-700">每源数量</label>
+                <div class="flex flex-wrap gap-2">
+                  <div
+                    v-for="n in sizeOptions"
+                    :key="n"
+                    class="inline-flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer"
+                    :class="selectedSizes[n] ? 'text-black' : 'text-gray-700'"
+                    @click="onSizeChange(n)"
+                  >
+                    <span
+                      class="inline-flex items-center justify-center w-3 h-3 rounded-full border"
+                      :class="selectedSizes[n] ? 'border-black' : 'border-gray-400'"
+                    >
+                      <span
+                        v-if="selectedSizes[n]"
+                        class="w-2 h-2 bg-black rounded-full"
+                      />
+                    </span>
+                    <span>{{ n }}条</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-900 hover:bg-gray-200"
+                @click="resetFilter"
+              >
+                重置
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-full bg-black px-4 py-2 text-sm text-white hover:bg-black/90"
+                @click="applyFilter"
+              >
+                应用
+              </button>
+            </div>
+          </div>
+        </div>
 
         <!-- 空状态 -->
         <div
@@ -87,6 +160,7 @@
 
 <script setup>
 import Lenis from "lenis";
+import { ref, computed, watch } from "vue";
 // 服务端数据获取
 const {
   data: newsData,
@@ -100,8 +174,79 @@ const {
 
 // 响应式数据
 
-// 计算属性
-const filteredNews = computed(() => newsData.value || []);
+const showFilter = ref(false);
+const platformOptions = computed(() => {
+  const data = newsData.value || [];
+  const map = {};
+  data.forEach((item) => {
+    if (item.platform && !map[item.platform]) {
+      map[item.platform] = { id: item.platform, name: item.source || item.platform };
+    }
+  });
+  return Object.values(map);
+});
+const selectedPlatforms = ref({});
+const sizeOptions = [5, 10, 20, 30];
+const selectedSizes = ref({ 5: true, 10: false, 20: false, 30: false });
+watch(
+  platformOptions,
+  (opts) => {
+    const next = {};
+    opts.forEach((o) => {
+      next[o.id] = selectedPlatforms.value[o.id] ?? true;
+    });
+    selectedPlatforms.value = next;
+  },
+  { immediate: true }
+);
+const pageSize = computed(() => {
+  for (const n of sizeOptions) {
+    if (selectedSizes.value[n]) return n;
+  }
+  return 5;
+});
+const filteredNews = computed(() => {
+  const data = newsData.value || [];
+  const active = Object.keys(selectedPlatforms.value).filter((k) => selectedPlatforms.value[k]);
+  if (active.length === 0) return [];
+  const groups = {};
+  data.forEach((item) => {
+    if (!active.includes(item.platform)) return;
+    if (!groups[item.platform]) groups[item.platform] = [];
+    groups[item.platform].push(item);
+  });
+  let result = [];
+  active.forEach((p) => {
+    const items = (groups[p] || []).slice().sort((a, b) => (b.hotValue || 0) - (a.hotValue || 0));
+    result = result.concat(items.slice(0, pageSize.value));
+  });
+  result.sort((a, b) => (b.hotValue || 0) - (a.hotValue || 0));
+  return result;
+});
+const applyFilter = () => {
+  showFilter.value = false;
+};
+const resetFilter = () => {
+  const opts = platformOptions.value;
+  const sel = {};
+  opts.forEach((o) => (sel[o.id] = true));
+  selectedPlatforms.value = sel;
+  selectedSizes.value = { 5: true, 10: false, 20: false, 30: false };
+  showFilter.value = false;
+};
+const onSizeChange = (n) => {
+  const next = { 5: false, 10: false, 20: false, 30: false };
+  next[n] = true;
+  selectedSizes.value = next;
+};
+const togglePlatform = (id) => {
+  const current = !!selectedPlatforms.value[id];
+  if (current) {
+    const count = Object.values(selectedPlatforms.value).filter(Boolean).length;
+    if (count <= 1) return;
+  }
+  selectedPlatforms.value[id] = !current;
+};
 
 // 方法
 const loading = ref(false);

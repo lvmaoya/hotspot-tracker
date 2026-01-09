@@ -16,6 +16,7 @@
           type="button"
           class="inline-flex items-center gap-1.5 px-2.5 py-1.5 card-bg rounded-md"
           aria-label="筛选"
+          @click="$emit('filter')"
         >
           <span class="text-sm text-primary">筛选</span>
           <svg
@@ -36,6 +37,7 @@
           type="button"
           class="inline-flex items-center gap-1.5 px-2.5 py-1.5 card-bg rounded-md"
           aria-label="排序"
+          @click="$emit('sort')"
         >
           <span class="text-sm text-primary">排序</span>
           <svg
