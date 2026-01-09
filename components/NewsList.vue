@@ -12,8 +12,9 @@
         >
         <span v-else>{{ item.title }}</span>
       </span>
-      <span class="platform">{{ item.icon || '' }}</span>
-      <span class="hot">{{ formatHot(pickHot(item)) }}</span>
+      <span class="platform">
+        <img :src="getPlatformIcon(item.platform)" class="icon" />
+      </span>
     </li>
   </ul>
 </template>
@@ -33,30 +34,15 @@ const props = defineProps({
 const list = computed(() =>
   props.news && props.news.length ? props.news : props.items
 );
-const pickHot = (item) => item?.hot ?? item?.hotValue ?? item?.heat;
-const formatHot = (hot) => {
-  if (hot == null) return "0";
-  if (typeof hot === "number") {
-    if (hot >= 10000) {
-      const v = hot / 10000;
-      const s = v.toFixed(1);
-      return (s.endsWith(".0") ? s.slice(0, -2) : s) + "万";
-    }
-    return String(hot);
-  }
-  const str = String(hot).trim();
-  if (!str) return "0";
-  if (/[万wW]$/.test(str)) return str.replace(/[wW]$/, "万");
-  const n = parseFloat(str.replace(/[^\d.]/g, ""));
-  if (!isNaN(n)) {
-    if (n >= 10000) {
-      const v = n / 10000;
-      const s = v.toFixed(1);
-      return (s.endsWith(".0") ? s.slice(0, -2) : s) + "万";
-    }
-    return String(Math.round(n));
-  }
-  return str;
+const getPlatformIcon = (platform) => {
+  const map = {
+    weibo: "https://weibo.com/favicon.ico",
+    zhihu: "https://www.zhihu.com/favicon.ico",
+    baidu: "https://www.baidu.com/favicon.ico",
+    thepaper: "https://www.thepaper.cn/favicon.ico",
+    douyin: "https://www.douyin.com/favicon.ico",
+  };
+  return map[platform] || "/favicon.ico";
 };
 </script>
 
@@ -96,10 +82,13 @@ const formatHot = (hot) => {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.hot {
-  color: var(--text-secondary);
-}
 .platform {
   color: var(--text-secondary);
+}
+.icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-block;
 }
 </style>

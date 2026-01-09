@@ -131,25 +131,35 @@ export const newsSources = [
     responseType: "text",
   },
   {
-    name: "今日头条",
-    platform: "toutiao",
-    url: "https://www.toutiao.com/hot-event/hot-board/?origin=tt_pc_hot",
+    name: "澎湃新闻热榜",
+    platform: "thepaper",
+    url: "https://cache.thepaper.cn/contentapi/wwwIndex/rightSidebar",
     icon: "📰",
-    color: "orange",
+    color: "blue",
     parseData: (data) => {
       try {
-        if (data.data) {
-          return data.data.slice(0, 20).map((item) => ({
-            title: item.Title,
-            hot: item.HotValue,
-            url: `https://www.toutiao.com/trending/${item.ClusterId}`,
-            tag: item.Label,
-            icon: "📰",
-          }));
-        }
-        return [];
+        const raw = data?.data?.hotNews;
+        const list = Array.isArray(raw)
+          ? raw
+          : raw && typeof raw === "object"
+          ? Object.values(raw)
+          : [];
+        if (!Array.isArray(list) || list.length === 0) return [];
+        return list.slice(0, 20).map((item) => ({
+          title: item?.name || "",
+          hot:
+            item?.interactionNum ??
+            item?.praiseTimes ??
+            item?.commentCount ??
+            0,
+          url: item?.contId
+            ? `https://www.thepaper.cn/newsDetail_forward_${item.contId}`
+            : item?.url || "",
+          tag: (item?.nodeInfo && item.nodeInfo.name) || "热点",
+          icon: "📰",
+        }));
       } catch (error) {
-        console.error("解析头条数据失败:", error);
+        console.error("解析澎湃新闻数据失败:", error);
         return [];
       }
     },
@@ -157,8 +167,9 @@ export const newsSources = [
       "User-Agent":
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       Accept: "application/json",
-      Referer: "https://www.toutiao.com/",
+      Referer: "https://www.thepaper.cn/",
     },
+    responseType: "json",
   },
   {
     name: "抖音热榜",
@@ -190,36 +201,6 @@ export const newsSources = [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       Accept: "application/json",
       Referer: "https://www.douyin.com/",
-    },
-  },
-  {
-    name: "B站热榜",
-    platform: "bilibili",
-    url: "https://api.bilibili.com/x/web-interface/ranking/v2",
-    icon: "📺",
-    color: "indigo",
-    parseData: (data) => {
-      try {
-        if (data.data && data.data.list) {
-          return data.data.list.slice(0, 20).map((item) => ({
-            title: item.title,
-            hot: item.stat && item.stat.view ? `${item.stat.view}观看` : "热门",
-            url: `https://www.bilibili.com/video/${item.bvid}`,
-            tag: item.tname,
-            icon: "📺",
-          }));
-        }
-        return [];
-      } catch (error) {
-        console.error("解析B站数据失败:", error);
-        return [];
-      }
-    },
-    headers: {
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      Accept: "application/json",
-      Referer: "https://www.bilibili.com/",
     },
   },
 ];
